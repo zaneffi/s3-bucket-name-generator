@@ -1,42 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
-<body>
-    <header>
-        <h1>Globally Unique Bucket Name Generator</h1>
-        <h2>Generate a globally unique bucket name for your cloud storage</h2>
-        <span>The whole generation process is done on the client side, offline. No data is sent to any server.</span>
-    </header>
-    <section>
-        <form onsubmit="event.preventDefault(); generateBucketName(this); return false" action="">
-            <div>
-                <label for="name">Bucket Name</label>
-                <input type="text" id="name" name="name" required minlength="3" maxlength="51" />
-            </div>
-            <div>
-                <button type="submit">Generate</button>
-            </div>
-        </form>
-        <div id="result-container" style="opacity: 0;">
-            <div>
-                <h3>Generated Globaly Unique Bucket Name</h3>
-                <span id="bucket_name"></span>
-            </div>
-        </div>
-    </section>
-</body>
-<script>
-    function generateRandomAlphaNum(length) {
-        const chars = '0123456789abcdefghijklmnopqrstuvwxyz';
-        let result = '';
-        for (let i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
-        return result;
-    }
 
-    window.generateBucketName = function(form) {
-        const name = form.name.value;
-        const bucket_name = `${name.toLowerCase()}${generateRandomAlphaNum(6)}-${generateRandomAlphaNum(6)}`;
-        document.getElementById('bucket_name').innerText = bucket_name;
-        document.getElementById('result-container').style.opacity = 1;
-    }
-</script>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Globally Unique Bucket Name Generator</title>
+    <meta name="description" content="Generate a globally unique bucket name for your cloud storage with a simple click.">
+    <style>
+        body {
+            font-family: 'Geologica', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: #eaeaea;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header__title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .header__subtitle {
+            font-size: 1.25rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+        }
+
+        .header__description {
+            font-size: 0.875rem;
+            color: #aaa;
+        }
+
+        .form-container {
+            padding: 60px 100px;
+            max-width: 500px;
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+
+        .form-container__group {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-container__label {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-container__input {
+            padding: 10px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            background-color: #333;
+            color: #eaeaea;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .form-container__button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .form-container__button:hover {
+            background-color: #0056b3;
+        }
+
+        .result-container {
+            margin-top: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            padding: 15px;
+            background-color: #3a3a3a;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-container__title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .result-container__name {
+            display: block;
+            margin-top: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #76c7c0;
+            word-break: break-word;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .copy-icon {
+            position: relative;
+            bottom: 6px;
+            width: 24px;
+            height: 24px;
+            color: #76c7c0;
+            cursor: pointer;
+            transition: fill 0.3s ease;
+        }
+
+        .copy-icon:hover {
+            fill: #58a6a2;
+        }
+
+        .toast {
+            visibility: hidden;
+            min-width: 200px;
+            margin-left: -125px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 2px;
+            padding: 10px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            bottom: 30px;
+            font-size: 17px;
+            transition: visibility 0.5s, opacity 0.5s linear;
+        }
+
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 720px) {
+            .form-container {
+                max-width: 100%;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .header__title {
+                font-size: 1.75rem;
+            }
+
+            .header__subtitle {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <header class="header">
+            <h1 class="header__title">Globally Unique Bucket Name Generator</h1>
+            <h2 class="header__subtitle">Generate a globally unique bucket name for your cloud storage</h2>
+            <span class="header__description">The whole generation process is done on the client side, offline. No data is sent to any server.</span>
+        </header>
+        <form onsubmit="event.preventDefault(); generateBucketName(this); return false">
+            <div class="form-container__group">
+                <label for="name" class="form-container__label">Bucket Name</label>
+                <input type="text" id="name" name="name" class="form-container__input" required minlength="3" maxlength="51" />
+            </div>
+            <button type="submit" class="form-container__button">Generate</button>
+        </form>
+        <div id="result-container" class="result-container">
+            <span id="bucket_name" class="result-container__name"></span>
+            <svg id="copy-icon" class="copy-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" color="currentColor" fill="none">
+                <path d="M9 15C9 12.1716 9 10.7574 9.87868 9.87868C10.7574 9 12.1716 9 15 9L16 9C18.8284 9 20.2426 9 21.1213 9.87868C22 10.7574 22 12.1716 22 15V16C22 18.8284 22 20.2426 21.1213 21.1213C20.2426 22 18.8284 22 16 22H15C12.1716 22 10.7574 22 9.87868 21.1213C9 20.2426 9 18.8284 9 16L9 15Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M16.9999 9C16.9975 6.04291 16.9528 4.51121 16.092 3.46243C15.9258 3.25989 15.7401 3.07418 15.5376 2.90796C14.4312 2 12.7875 2 9.5 2C6.21252 2 4.56878 2 3.46243 2.90796C3.25989 3.07417 3.07418 3.25989 2.90796 3.46243C2 4.56878 2 6.21252 2 9.5C2 12.7875 2 14.4312 2.90796 15.5376C3.07417 15.7401 3.25989 15.9258 3.46243 16.092C4.51121 16.9528 6.04291 16.9975 9 16.9999" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </div>
+        <div id="toast" class="toast">Bucket name copied!</div>
+    </div>
+    <script>
+        function generateRandomAlphaNum(length) {
+            const chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+            let result = '';
+            for (let i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+            return result;
+        }
+
+        window.generateBucketName = function(form) {
+            const name = form.name.value;
+            const bucket_name = `${name.toLowerCase()}${generateRandomAlphaNum(6)}-${generateRandomAlphaNum(6)}`;
+            document.getElementById('bucket_name').innerText = bucket_name;
+            document.getElementById('result-container').style.opacity = 1;
+        }
+
+        const copyIcon = document.getElementById('copy-icon');
+        const bucketNameElement = document.getElementById('bucket_name');
+        const toast = document.getElementById('toast');
+
+        copyIcon.addEventListener('click', function() {
+            const bucketName = bucketNameElement.innerText;
+            navigator.clipboard.writeText(bucketName).then(() => {
+                showToast();
+            });
+        });
+
+        function showToast() {
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+    </script>
+</body>
+
 </html>
