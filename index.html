@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <header>
+        <h1>Globally Unique Bucket Name Generator</h1>
+        <h2>Generate a globally unique bucket name for your cloud storage</h2>
+        <span>The whole generation process is done on the client side, offline. No data is sent to any server.</span>
+    </header>
+    <section>
+        <form onsubmit="event.preventDefault(); generateBucketName(this); return false" action="">
+            <div>
+                <label for="name">Bucket Name</label>
+                <input type="text" id="name" name="name" required minlength="3" maxlength="51" />
+            </div>
+            <div>
+                <button type="submit">Generate</button>
+            </div>
+        </form>
+        <div id="result-container" style="opacity: 0;">
+            <div>
+                <h3>Generated Globaly Unique Bucket Name</h3>
+                <span id="bucket_name"></span>
+            </div>
+        </div>
+    </section>
+</body>
+<script>
+    function generateRandomAlphaNum(length) {
+        const chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+        let result = '';
+        for (let i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+        return result;
+    }
+
+    window.generateBucketName = function(form) {
+        const name = form.name.value;
+        const bucket_name = `${name.toLowerCase()}${generateRandomAlphaNum(6)}-${generateRandomAlphaNum(6)}`;
+        document.getElementById('bucket_name').innerText = bucket_name;
+        document.getElementById('result-container').style.opacity = 1;
+    }
+</script>
+</html>
